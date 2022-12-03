@@ -1,0 +1,75 @@
+﻿@model IEnumerable<Day_8.Models.Employe>
+@{
+    ViewData["Title"] = "List";
+}
+
+<h1>Show Employe</h1>
+<button class="btn btn-danger"><a asp-action="Add">Add</a></button>
+<table class="table">
+    <thead>
+        <tr>
+            <th> ID </th>
+            <th >UserName</th>
+            <th >Password</th>
+            <th>BirthDay</th>
+            <th>Email</th>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>GroupId</th>
+            <th>Status</th>
+            <th> Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.UserName</td>
+                        <td>@item.Password</td>
+                        <td>@item.BirthDay</td>
+                        <td>@item.Email.ToLower()</td>
+                        <td>@item.Age</td>
+                    <td>
+                    @{
+                        var gender = "";
+                        if (item.Gender)
+                        {
+                            gender = "Nam";
+                        }
+                        else
+                        {
+                            gender = "Nu";
+                        }
+                    }
+                    @gender
+                    </td>
+                        <td>@item.GroupId</td>
+                    <td>
+                    @{
+                        var status = "";
+                        if (item.Status)
+                        {
+                            status = "Active";
+                        }
+                        else
+                        {
+                            status = "Non_active";
+                        }
+                    }
+                    @status
+                    </td>
+                    <td>
+
+
+                            <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                            <a asp-action="ShowDetail" asp-route-id="@item.Id">List</a> |
+                            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+        }
+    </tbody>
+</table>
+<div class="text-center">
+    <button class="btn btn-danger"><a class="nav-link text-dark" asp-area="Login" asp-controller="Account" asp-action="Logout">Logout</a></button>
+</div>
