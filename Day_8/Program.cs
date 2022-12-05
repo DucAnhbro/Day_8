@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using Ntq.Training.App.Filters;
+using Day_8.Filters;
 using Day_8.Middleware;
 using Day_8.Dto;
 using Day_8.Models;
 using System.Net;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Day_8
 {
@@ -12,25 +13,71 @@ namespace Day_8
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            //string conn = builder.Configuration.GetConnectionString("Conn");
-            // Add services to the container.
+            string conn = builder.Configuration.GetConnectionString("Conn");
+            //add services to the container.
+            builder.Services.AddSession();
+            builder.Services.AddControllersWithViews(options =>
+            { 
+            });
+            builder.Services.AddDbContext<EmployessContext>(options =>
+            {
+                options.UseSqlServer(conn);
+            });
             builder.Services.AddSession();
 
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+   .AddCookie("DemoSecurityScheme", options =>
+   {
+       options.AccessDeniedPath = new PathString("/Account/Access");
+       options.Cookie = new CookieBuilder
+       {
+           //Domain = "",
+           HttpOnly = true,
+           Name = ".aspNetCoreDemo.Security.Cookie",
+           Path = "/",
+           SameSite = SameSiteMode.Lax,
+           SecurePolicy = CookieSecurePolicy.SameAsRequest
+       };
+       options.Events = new CookieAuthenticationEvents
+       {
+           OnSignedIn = context =>
+           {
+               Console.WriteLine("{0} - {1}: {2}", DateTime.Now,
+                   "OnSignedIn", context.Principal.Identity.Name);
+               return Task.CompletedTask;
+           },
+           OnSigningOut = context =>
+           {
+               Console.WriteLine("{0} - {1}: {2}", DateTime.Now,
+                   "OnSigningOut", context.HttpContext.User.Identity.Name);
+               return Task.CompletedTask;
+           },
+           OnValidatePrincipal = context =>
+           {
+               Console.WriteLine("{0} - {1}: {2}", DateTime.Now,
+                   "OnValidatePrincipal", context.Principal.Identity.Name);
+               return Task.CompletedTask;
+           }
+       };
+       //options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
+       options.LoginPath = new PathString("/Account/Login");
+       options.ReturnUrlParameter = "RequestPath";
+       options.SlidingExpiration = true;
+   });
             builder.Services.AddControllersWithViews(options =>
             {
-                //options.Filters.Add<Authorization>();
-                //options.Filters.Add<LoggingFilter>();
+                options.Filters.Add<LoggingFilter>();
             });
-            //builder.Services.AddDbContext<RoleUserAppContext>(options =>
-            //{
-            //    options.UseSqlServer(conn);
-            //});
+            builder.Services.AddDbContext<EmployessContext>(options =>
+            {
+                options.UseSqlServer(conn);
+            });
             builder.Services.AddSession();
 
             builder.Services.AddAuthorization(options =>
             {
                 options.AddPolicy("admin",
-                     policy => policy.RequireRole("Create user"));
+                     policy => policy.RequireRole("Create Employe"));
             });
             var app = builder.Build();
 
@@ -42,7 +89,7 @@ namespace Day_8
                 app.UseHsts();
             }
             app.UseSession();
-
+            
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

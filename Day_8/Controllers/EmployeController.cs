@@ -18,7 +18,7 @@ namespace Day_8.Controllers
         //    return View(_db.Employes.ToList());
         //}
 
-        //public ActionResult Add()
+        //public ActionResult ShowDetail()
         //{
         //    return View();
         //}
@@ -46,20 +46,22 @@ namespace Day_8.Controllers
         //    }
         //    return View();
         //}
-
-        public async Task<IActionResult> ShowDetail(int? id)
+        [HttpGet]
+        public async Task<IActionResult> ShowDetail()
         {
-            if (id == null || _db.Employes == null)
+            var userEmail = HttpContext.Session.GetString("auth");
+            if ( string.IsNullOrEmpty(userEmail) || _db.Employes == null)
             {
                 return NotFound();
             }
 
             var em = await _db.Employes
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.Email == userEmail);
             if (em == null)
             {
                 return NotFound();
             }
+
 
             return View(em);
         }
@@ -151,6 +153,8 @@ namespace Day_8.Controllers
         {
             return _db.Employes.Any(e => e.Id == id);
         }
+
+        
 
         public ActionResult Logout()
         {

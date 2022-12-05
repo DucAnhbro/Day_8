@@ -5,10 +5,6 @@ namespace Day_8.Models;
 
 public partial class Employe
 {
-    public Employe()
-    {
-        EmployeRole = new HashSet<EmployeRole>();
-    }
     public int Id { get; set; }
 
     public string Password { get; set; } = null!;

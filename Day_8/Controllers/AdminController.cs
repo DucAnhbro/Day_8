@@ -107,7 +107,7 @@ namespace Day_8.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(List));
             }
             return View(employe);
         }
@@ -144,7 +144,7 @@ namespace Day_8.Controllers
             }
 
             await _db.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(List));
         }
         private bool EmployesExists(int id)
         {
